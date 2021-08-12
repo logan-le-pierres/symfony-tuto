@@ -51,4 +51,5 @@ Mais ce n'est pas tout puisque on peut l'intégrer directement en parametre :
     */
     On clique droit sur route et on importe cette classe puis on clique sur annotation route.
     On place en parametre de Route() 1/ le chemi 2/ le nom 3/pas besoin de mettre le controller puisque on est deja au dessus de la fonction à appeller
-    Là il y aura une erreur donc il faut installer des packages supplementaire (symfony flex)
+    Là il y aura une erreur donc il faut installer des packages supplementaire (symfony flex) => C'est un plugin de composer et avec "composer require annotations" il nous install le package permettant de lire les annotations 
+    IMPORTANT d'aller jetter un oeil sur packagiste.org 
