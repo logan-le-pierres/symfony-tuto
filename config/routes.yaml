@@ -5,12 +5,11 @@
 # test:
 #    path: /test/{age<\d+>?0}
 #    controller: App\Controller\TestController::test
-#   #  defaults: 
-#   #     age: 0
-#   #  requirements: 
-#   #     age: \d+
+#    defaults: 
+#       age: 0
+#    requirements: 
+#       age: \d+
 
 #    methods: [GET, POST]
-# # host: localhost
+#     host: localhost
 #    schemes: [http,https]
-

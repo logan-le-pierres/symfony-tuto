@@ -53,3 +53,50 @@ Mais ce n'est pas tout puisque on peut l'intégrer directement en parametre :
     On place en parametre de Route() 1/ le chemi 2/ le nom 3/pas besoin de mettre le controller puisque on est deja au dessus de la fonction à appeller
     Là il y aura une erreur donc il faut installer des packages supplementaire (symfony flex) => C'est un plugin de composer et avec "composer require annotations" il nous install le package permettant de lire les annotations 
     IMPORTANT d'aller jetter un oeil sur packagiste.org 
+
+/---------------------------------------------------------------------------------------------------/
+/                                                                                                   /
+/                                       C H A P I T R E  5                                          /
+/                                                                                                   /
+/---------------------------------------------------------------------------------------------------/
+
+Container de service 
+
+1/ Un service est un outils, une classe.
+    En tapant "php bin/console debug:autowiring" 
+Autowiring => symfony analyse le constructeur d'une classe afin de lui fournir ce qu'elle demande (quels service y mettre)
+    Il en existe de plusieurs type : loggers, mailer, router...
+    On les obtient soit par injection de dépendance directement dans les parametre du __constructeur soit MAIS ATTENTION au niveau des fonction (méthodes) couplée a une route et uniquement dans le controller.
+
+2/ Comment créer ses propres services ? Dossier "src" (cf Taxes) et il faut savoir que toutes les classes déclarées dans "src" ce sont des service que l'on peut demandé a symfony
+3/ Pour bien comprendre les service il est impératif de bien saisir la notion de "container de services" 
+    ==> Dans symfony on utilise une librairie qui s'appelle symfony/dependency-injection // les bundles symfony mettent deja à disposition des services prédef, mais on a egalement vu qu'il est possible d'en creer nous meme dans/src.
+4/ On s'aperçoit qu'en mettant en paramètre du construct dans la classe calculator "float $tva" il y a un message d'erreur. Pour gérer ça on va pouvoir apprendre au container ce qu'on veut dire par la, comment il doit le construire 
+    => Dans le dossier config, fichier "services.yaml" ==> tout en bas, en faisant attention a l'indentation on met 
+    App\Taxes\Calculator: 
+        arguments:
+            $tva: 20
+ET PAF ça remarque (on vient de lui expliquer à quoi correspond $tva) !
+
+Comment définir dans le container de service définir des librairie externes qu'on va télécharger ?
+(def SLUG = phrase ecrite au format URL ) On vient d'installer cela via packagiste puis nous avons :
+   => "use Cocur\Slugify\Slugify;"
+   => Instancier la classe Slugify et testé, cela marche
+Pour le coup là ça peut aller mais si jamais on doit créer plusieurs fois la même classe etc ça peut devenir vite relou, donc autant la passer en parametre du constructeur, cependant on doit expliquer au service.yaml ce qu'il en est. 
+            => on lui passe le chemin et apres les : on met un ~ (tild) si on a rien de spécifique à lui dire. 
+
+5/ La différence entre un bundle Symfony et une librairie classique(comme par ex slugify que nous venons d'installer)
+  LA grosse diff c'est que la librairie de service suppose qu'on aille manuellement expliquer dans le service.yaml ce qu'il en est alors que bundle va de lui même "expliquer" ce qu'il en est sans qu'on n'ai rien a toucher.
+Prennons un exemple : composer require twig (rappellons d'ailleurs ici que "twig" en soit n'existe pas mais avec symfony flex il comprend directement ce qu'on veut)
+    Cela est ajouté a bundle.php et devient connu de noter projet? Sachons qu'à l'origine il y en existe de prédef dans le kern 
+
+6/ (5.9) Pour bien comprendre la spécificité d'une fonction d'un controller qui est lié a une route ! 
+Quand symfony reçoit une requete http il va vérifier avec l'UrlMatcher si la route correspond a qqch. Ensuite il va voir qu'elle fonction doit répondre a cette route.
+Puis viens une fonction qui s'appelle l'ArgumentResolver 
+        --> 3 possibilitées : 
+        1/ Un des paramètre est "Request" => Il va aller chercher ça
+        2/ Le parametre n'a pas de type, simplement une chaine de caractere par exemple ET qui est un parametre de la Route, pas de soucis il va aller chercher ce qu'il y a dans l'url a la place de prenom(par ex)
+        3/ L'argumentResolver se rend compte que ce qui est appellé sont des services qui sont dans le container.
+En soit l'ArgumentResolver est le "petit robot" qui va analyser la méthode liée à la Route afin de découvrir ses paramètres et de les lui fournir !
+EXERCICE 
+-> Service Detector (a faire dans classe detector dans le dossier des taxe avec methode public hellocontroller)
