@@ -100,3 +100,35 @@ Puis viens une fonction qui s'appelle l'ArgumentResolver
 En soit l'ArgumentResolver est le "petit robot" qui va analyser la méthode liée à la Route afin de découvrir ses paramètres et de les lui fournir !
 EXERCICE 
 -> Service Detector (a faire dans classe detector dans le dossier des taxe avec methode public hellocontroller)
+
+
+/---------------------------------------------------------------------------------------------------/
+/                                                                                                   /
+/                                       C H A P I T R E  6                                          /
+/                                                                                                   /
+/---------------------------------------------------------------------------------------------------/
+
+1/          D E C O U V E R T E   D E   T W I G \o/ 
+ Pour bien démarrer cette session, notons que tout ou presque a été mis en commentaire.
+ De là, on appelle dans notre fonction hello "Environment $twig", puis on creer un fichier dans template=>"hello.html.twig"
+ Ensuite dans notre fonction hello on vient mettre $html = $twig->render('hello.html.twig)
+ RENDER() permet d'aller lire un fichier twig et nous rendre du html (inutile de dire que cela se situe dans le dossier template il le devine solo)
+ 3 syntaxes sont utilisables dans twig : 
+                1/ La syntaxe qu'on pourrait appeller AFFICHE :{{variable OU fonction(); OU ternaire par ex}}
+                2/ La synthaxe action : {%if age<18%}, else etc etc, destinnée a amener du dynamisme
+                3/ {#commentaire#} permet de commenter
+
+2/ Si on appelle {{name}} dans le fichier twig il nous indique une erreur : il faut lui passer en parametre de render avec un tableau associatif.
+    => De la ligne 10 a 29 sur le fichier hello.html.twig nous voyons differentes possibilités de Tags
+ 3/ Pour la 6.6 nous allons voir comment naviguer dans un tableau associatif
+
+    6.7/ Quand on regarde dans le seul fichier existant (base.html.twig) on rencontre des balise avec "block"
+    En fait on peut dans le fichier hello2.html.twig aller extends le ficher base, et target son block body pour y inser le h1 (ou autre)
+    6.8/ La notion d'inclusion 
+    Imaginons qu'on veuille reutiliser à plusieurs endroit certains bouts de code : autant créer un fichier twig à part (appellé un "partial");
+    On créer _formateur.html.twig et on lui passe "<p><strong>{{formateur.prenom}}</strong> {{formateur.nom}}</p>" puis dans notre fichier hello2 on lui indique 
+
+    "{% include "_formateur.html.twig" with {"formateur":formateur1} %}
+     {% include "_formateur.html.twig" with {"formateur":formateur2} %}"
+     (Autrement dit on inclut le "_formateur" et on dit "tu va dans ce fichier recupérer formateur 1 pour formateur (tab associatif))
+    LA 6.9 a revoir (flemme d'écrire, mal de dos)

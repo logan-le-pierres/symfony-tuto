@@ -4,11 +4,19 @@ namespace App\Taxes;
 
 
     class Detector {
-        public $detector;
+        protected $seuil;
 
-        public function detect(int $detector){
+        public function __construct(float $seuil){
 
-            if ($detector < 100){
+            $this->seuil = $seuil;
+
+        }
+
+        public function detect(int $prix){
+
+            
+
+            if ($prix < $this->seuil){
                 return true;
             
             }
