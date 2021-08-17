@@ -141,3 +141,36 @@ Ceci étant "neutre" elle permet d'etre appeller dans les functions où on a bes
     => Ainsi on optimise notre code en ayant besoin d'une seule ligne dans chaque function qui viendra appeller la function render à qui on a expliquer quels paramètres étaient attendue ! Propre.
 
 4/ Quand on créer un controller on peut hériter de la classe AbstractController ce qui rend inutile la function render ligne 76, de même pour ce __constructeur.
+
+
+/---------------------------------------------------------------------------------------------------/
+/                                                                                                   /
+/                                       C H A P I T R E  7                                         /
+/                                                                                                   /
+/---------------------------------------------------------------------------------------------------/
+
+===> Il est possible, dans le cadre de la gestion de BDD, d'utiliser PDO ou toute autre librairie.
+Il existe par ailleurs un ensemble de librairie appellé DOCTRINE et qui représente un ORM (intégré dans symfony via bundle)
+C'est une brique logiciel qui se place entre l'appli et la BDD et va faire lien en faisant correspondre les tables/enregistrements et le monde des objets.
+==> CAD que chaque classe va représenter une table de la BDD
+        DOCTRINE nous offre 3 outils : 
+            1/ Entité(enregistrements)
+            2/ Repository(depot/selection) permet de selectionner sur les tables
+            3/ l'outils principal : le manager de doctrine, permet de manipuler les entité (CRUD) 
+
+Faire attention pour nous car doctrine nous permet certes de ne plus s'occuper de la BDD à proprement parler DONC ne nous prépare pas aux atetntes du titre !!!!
+On va donc non pas utiliser SQL mais DQL : la difference est que nous n'allons pas effectuer des requetes sur nos tabkles mais sur nos classes.
+
+Bien, pour commencer nous allons écrire "php bin/console doctrine:database:create",
+Nous avons au préalable, dans le fichier .env, mis a jour la ligne SQL ( DATABASE_URL="mysql://root:@127.0.0.1:3306/app_uio?serverVersion=5.7"
+Ensuite nous allons rentrer dans le terminal : composer require maker (pour rappel encore une fois maker en soit n'existe pas mais symfony flex nou le permet)
+"php bin/console make:migration" va générer un fichier dans le dossier migration qui se nommera à la date et l'heure de la migration (permet de trier plus facilement du coup). Si on l'ouvre on découvre la requete SQL/DQL ainsi que deux fonctions :
+==> La premiere permettant de passer de A -> B (ou autrement dit de l'état initial des données à celui après migration)
+==> La deuxième permettant de passer de B -> A (fonction down() permettant de revenir en arriere si on a fait une erreur par exemple)
+
+Il faut bien comprendre qu'à ce stade le fichier de migration est "sur la rampe de lancement", c'est à dire qu'il est pret a etre "injecter" dans la BDD mais ne l'est pas encore. Il suffit de regarder les informations dans le termnal pour le comprendre,
+il nous propose de poursuivre avec la commande "php bin/console doctrine:migration:migrate";
+
+Par la suite on alimente de vraies données la BDD via phpmyadmin,
+
+REPRENDRE A LA 7.6
