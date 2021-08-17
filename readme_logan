@@ -131,4 +131,13 @@ EXERCICE
     "{% include "_formateur.html.twig" with {"formateur":formateur1} %}
      {% include "_formateur.html.twig" with {"formateur":formateur2} %}"
      (Autrement dit on inclut le "_formateur" et on dit "tu va dans ce fichier recupérer formateur 1 pour formateur (tab associatif))
-    LA 6.9 a revoir (flemme d'écrire, mal de dos)
+
+3/ Important : ici plutot que de répéter du code (hello et example) il est tout de même plus quali de se faire livrer des services dans le __construct (Environment $twig) pour pouvoir l'utiliser à l'infini par la suite et donc
+de le supprimmer des hello/example. On pensera pour le coup à bien modifier en mettant le $this dans "return $this->render('hello2.html.twig',[
+            'name' => $name]);" par exemple.
+
+De là nous allons créer une public function render() qui prendra en paramètre =>  render(string $path, array $variable = []);
+Ceci étant "neutre" elle permet d'etre appeller dans les functions où on a besoin de render() où on mettra en paramètre la page twig voulue ($path) et la variable voulue (ex: ['age'=>33]) !
+    => Ainsi on optimise notre code en ayant besoin d'une seule ligne dans chaque function qui viendra appeller la function render à qui on a expliquer quels paramètres étaient attendue ! Propre.
+
+4/ Quand on créer un controller on peut hériter de la classe AbstractController ce qui rend inutile la function render ligne 76, de même pour ce __constructeur.
