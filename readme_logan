@@ -173,4 +173,47 @@ il nous propose de poursuivre avec la commande "php bin/console doctrine:migrati
 
 Par la suite on alimente de vraies données la BDD via phpmyadmin,
 
-REPRENDRE A LA 7.6
+1/ Allez voir les fichiers HomeController et Product.php
+Differentes méthodes s'offrent à nous pour jouer avec la BDD et récupérer ce que l'on veut => 
+    Avant ça rappellons ce que nous venons de faire : 
+    1/ Appeller le service "ProductRepository $productRepository" dans notre fonction homepage du HomeController
+    2/ Définir ce que nous voulons passer a $products (objet)
+    3/ Quelques exemples count,find, findBy, findOneBy,findAll() etc (pour findBy on peut passer plusieurs criteres et paramètres)
+
+Video 7.7, comment utiliser le manager d'entités :
+=> Toujours pareil soit dans le __construct soit dans une méthode relié à une route, on passe en parametres "EntityManagerInterface $em"
+    Puis on instancie un nouveal objet de la class Product dans laquelle on vient définir ses attributs "$product->setName('Table en métal');
+        $product->setPrice(2500);
+        $product->setSlug('Table-en-métal');"
+        etc
+De là on va utiliser les méthodes persist() et flush() qui respectivement vont permettre de persister/préparer et d'injecter en BDD.
+
+
+    Comment faire pour modifier un produit ? =>
+    On va utiliser le repository :
+    |=>    "$productRepository = $em->getRepository(Product::class);"
+    |
+    |=> Signifie "Dans l'attribut "$productRepository" on récupère via l'EntityManager($em) à qui on demande un repository(getRepository()). 
+        Etant donné qu'il y en a potentiellement plusieurs on vient lui spécifier lequel nous souhaitons récuperer celui qui a la gestion Product.
+        Cela s'exprime par "(Product::class)".  
+    A retenir pour l'entity manager : find,flush,remoove,persist
+
+EXERCICE fait avec grand succès ! 
+=> Toutefois imaginons qu'on se soit trompé lors des la création, comment faire pour changer tout ça ? C'est ce qu'on voit en 7.10
+
+2/ Intéréssant de se pencher sur "php bin/console doctrine" et notamment celles sur migration
+Avec : php bin/console doctrine:migration:status on peut voir les dernieres migrations
+Avec : php bin/console doctrine:migration:migrate __help on peut voir pas mal de chose interessantes
+On peut par exemple revenir à la version premiere, precedente, derniere etc etc 
+
+
+Nous allons maintenant voir les fixtures ==> JEUX DE FAUSSES DONNEES 
+    Il existe un bundle qui s'appelle Doctrine Fixtures Bundle
+
+On tape donc "composer require orm-fixtures" (==> Même mayonnaise que vu avant : orm-fixture en soit n'existe pas mais symfony flex (alias) va nous permettre d'aller le chercher)
+De la il nous créer un dossier dans src (DataFixture) qui va nous permettre de nous livrer  ObjectManager.
+Allons dont voir le fichier AppFixtures.php et alnçons la commande "php bin/console doctrine:fixture:load"
+Et là BOOM c'est insane mais on peut faire mieux ! Comme installer d'autres librairies nous permettant de rendre plus réaliste ce jeu de données. 
+ _____________
+|F   K   R <3 |
+|__A___ E_____| 
