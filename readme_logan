@@ -162,7 +162,7 @@ Faire attention pour nous car doctrine nous permet certes de ne plus s'occuper d
 On va donc non pas utiliser SQL mais DQL : la difference est que nous n'allons pas effectuer des requetes sur nos tabkles mais sur nos classes.
 
 Bien, pour commencer nous allons écrire "php bin/console doctrine:database:create",
-Nous avons au préalable, dans le fichier .env, mis a jour la ligne SQL ( DATABASE_URL="mysql://root:@127.0.0.1:3306/app_uio?serverVersion=5.7"
+Nous avons au préalable, dans le fichier .env, mis a jour la ligne SQL ( DATABASE_URL="mysql://root:@127.0.0.1:3306/uio?serverVersion=5.7"
 Ensuite nous allons rentrer dans le terminal : composer require maker (pour rappel encore une fois maker en soit n'existe pas mais symfony flex nou le permet)
 "php bin/console make:migration" va générer un fichier dans le dossier migration qui se nommera à la date et l'heure de la migration (permet de trier plus facilement du coup). Si on l'ouvre on découvre la requete SQL/DQL ainsi que deux fonctions :
 ==> La premiere permettant de passer de A -> B (ou autrement dit de l'état initial des données à celui après migration)
@@ -203,7 +203,7 @@ EXERCICE fait avec grand succès !
 
 2/ Intéréssant de se pencher sur "php bin/console doctrine" et notamment celles sur migration
 Avec : php bin/console doctrine:migration:status on peut voir les dernieres migrations
-Avec : php bin/console doctrine:migration:migrate __help on peut voir pas mal de chose interessantes
+Avec : php bin/console doctrine:migration:migrate --help on peut voir pas mal de chose interessantes
 On peut par exemple revenir à la version premiere, precedente, derniere etc etc 
 
 
@@ -217,3 +217,118 @@ Et là BOOM c'est insane mais on peut faire mieux ! Comme installer d'autres lib
  _____________
 |F   K   R <3 |
 |__A___ E_____| 
+
+Pour résumer : si on veut faire rejoindre un projet a quelqu'un on peut : 
+1/ Il télécharge le projet
+2/ Il met a jour son .env pour connecter à la base de données
+3/ doctrine:database:create
+4/ doctrine:migration:migrate et se retrouve avec les même tables que nous
+5/ doctrine:fixture:load et il se retrouve avec un jeu de données insane
+6/ On peut meme rendre ca plus réaliste avec faker
+
+
+3/ Comment relier 2 tables entre elles ?
+    => On imagine la table Catergory. On tape php bin/console make:entity et on luiajouter un attribut products avec un "s" 
+        Quand le terminal nous demande quel type nous voulons, en tapant "?" une liste s'affiche et notamment celle concernant les associations
+        On selectione (pour cet exemple) OneToMany
+
+
+/---------------------------------------------------------------------------------------------------/
+/                                                                                                   /
+/                                       C H A P I T R E  10                                         /
+/                                                                                                   /
+/---------------------------------------------------------------------------------------------------/
+
+Les formulaires  
+
+De même que pour la BDD où on peut utiliser <PDO, une librairie de notre choix etc mais qu'on a utilisé doctrine, et bien on peut egalement faire de même pour les formulaire mais là encore Symfony nous propose des choses bien grandes, voyons plutôt.
+"composer require form" tu connais
+
+10.4             I M P O R T A N T 
+
+C'est pour configurer un form avec le formbuilder.
+La fonction 'add' peut prendre 3 paramètres  
+1/ Le nom du champs que l'on souhaite
+2/ Le type de champs (symfony pour ça utilise des classes) ici on va donner a add le nom de la classe qui nous permettra de representer le type de ce champs (texte par ex) => TextType(de component pas de doctrine)
+3/ Tableau d'options : selon le type défini) 
+
+Voir la video 10.6 pour relier la bdd aux choix de la liste déroulante.
+    En gros on s'est fait livrer le CategoryRepository pour pouvoir par la suite venir les stocker dans le tableau $options. Et lui même on a pu le remplir au bon endroit en le mettant en valeur de la clefs attendue par choices (de la class ChoiceType).
+
+Il existe des solutions plus simple ! Par exemple le chmps EntityType : 
+=> On cesse de se faire livrer CategoryRepository, puis on vire ChoiceType pour le remplacer par EntityType(en reliant ce ->add comme avant)
+=> On ne va plus utiliser 'choices' ici(le reste on garde)
+=> On le remplace par 'class' => Category::class et on suit de 'choice_label' => 'name'
+
+
+10.8/ Dans twig, quand on fait appel a FormView, qui est issu de la fonction createView, cela nous creer un formulaire mais assez basique.
+Pour rendre ca un peu plus flexible on peut utiliser "form_start(formView)"
+    =>CF la doc sur les fonctions (a mettre dans twig) "form_start", "form_widget","form_end","form_errors"
+Ce qu'il faut comprendre ici c'est qu'on décompose le simple FormView en plusieurs parties, ce qui nous permet d'inserer du contenu.
+On peut même aller plus si admettons nous voulons à l'interieur du form_widget etre encore plus précis : 
+==> form_row(formView.name)
+Et on peut encore allez plus loing, etc etc 
+
+Avec form_theme formView 'boostrap_4_layout.html.twig' on peut inserer un theme predef sans s'embeter a tout faire à la mano
+
+10.11 = recapitulatif.
+
+10.12/ Pour faire une action/récuperer les informations d'un formulaire : 
+    1/ On se fait livrer "Request $request"
+    2/ $form->handleRequest($request)
+    3/ $data = $form->getData()
+
+10.13 Pour stocker  => EntityManagerProduct 
+10.14 Création d'une classe de formulaire 
+
+
+10.15 On va php bin/console make:form ProductType qui va généré un fichier dans le src/Form.
+On a une classe ProductType qui extends de AbstractType et qui contient plusieurs méthodes et notamment FormBuilderInterface,
+qui a récup nos "add" de notre variable $builder, ENORME !
+De même une fonction configurationOptions a recupéré notre " 'data_class' => Product::class";
+On recupere tout ce qui concerne le formulaire pour le mettre dans controller (rien a faire la au final) et on l'inject dans notre ProductType.php
+CTRL + ESPACE pour importer les bonnes classe : en gros quand on code directement il nous le propose mais quand on copie colle des chose il n'est pas censé aller créer le use etc du coup avec ce raccourci cela permet de le faire.
+
+
+Du coup gros gros gain de place, et optimisation (pas de répétitions) ==> Anciennement nous avions les lignes suivantes dans notre HomeController :
+        
+        $builder =$factory->createBuilder(FormType::class, null, [
+            'data_class' => Product::class
+        ]);
+
+        HORS ==========> maintenant quand on demande a notre factory de creer un builder, il n'est pas necessaire de passer par FormType mais bien plutot par ProductType
+
+        $builder =$factory->createBuilder(ProductType::class); suffit désormais et pourra être rappellé par la suite.
+
+10.16 Decouverte des raccourcies de l'AbstractController
+
+ 
+10.17
+
+
+
+On passe directos à la 14.1 il faudra revenir sur cet écart plus tard.
+
+Deux questions différentes à aborder ::
+
+        A U T H E T I F I Q U A T I O N                                           A U T O R I S A T I O N 
+
+Es-tu vraiment celui que tu prétends être ?                             As tu le droit de faire ce que tu veux faire ? 
+
+
+Composant security de symfony.
+
+Les firewall = différentes regions/frontieres de notre site qui sont finalement les différentes URL.
+
+Bien pour commencer nous avons besoin d'un user, donc lezgo "php bin/console make:user User
+Cela genere plusieurs fichier comme par exemple User.php // UserEntity.php, ou encore l'ajout de données dans security.yaml
+Dans ce dernier on trouve notamment : 
+                    =>clef "encoders" : permet d'expliquer à l'encodeur de symfony que quand on veut encoder un mdp de l'entité user on veut utiliser tel ou tel algorythme.(ici c'est sur auto par defaut)
+                    => Providers indiquent au composant Security où se trouvent les données des utilisateurs
+                    => Firewall 
+
+L'entité User qui est apparue implemente la UserInterface : elle possede un id, une colonne email et ENFIN un colonne des roles qu'il a mis solo
+et qui va nous permettre par la suite de gérer les autorisations (as tu le droit de faire ceci ou cela) ?
+Puis vient une donnée password.
+Viennent les Geters et les Seters : 
+La methode GetRole qui récupere les roles et implemente de facto le ROLE_USER ==si il y a un user il y aura forcement un role user 
